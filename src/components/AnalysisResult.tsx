@@ -12,6 +12,7 @@ interface AnalysisResult {
     total_frames: number
     processing_time: number
     video_duration?: number
+    analysis_fps?: number
   }
   video_url?: string
   video_filename?: string
@@ -156,6 +157,12 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ result }) => {
               </span>
             </div>
           )}
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700">Analysis FPS:</span>
+            <span className="text-gray-900">
+              {analysis_results.analysis_fps || 3} FPS
+            </span>
+          </div>
         </div>
       </div>
 

@@ -27,12 +27,12 @@ function App() {
 
     if (hasSupabase) {
       // Check initial auth state
-      supabase.auth.getUser().then(({ data: { user } }) => {
+      supabase!.auth.getUser().then(({ data: { user } }) => {
         setUser(user)
       }).catch(console.error)
 
       // Listen for auth state changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = supabase!.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null)
       })
 
@@ -93,21 +93,41 @@ function App() {
         }
         formData.append('user_id', 'demo-user')
 
-        // Use production backend URL or fallback to local
+        // Get backend URL from environment or use default
         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
         const apiUrl = `${backendUrl}/analyze-video`
+
+        console.log('Calling API:', apiUrl)
+        console.log('Form data:', { 
+          hasVideo: !!file, 
+          videoUrl: url, 
+          userId: 'demo-user' 
+        })
 
         const response = await fetch(apiUrl, {
           method: 'POST',
           body: formData,
         })
 
+        console.log('Response status:', response.status)
+
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.detail || 'Analysis failed')
+          const errorText = await response.text()
+          console.error('API Error Response:', errorText)
+          
+          let errorMessage = 'Analysis failed'
+          try {
+            const errorData = JSON.parse(errorText)
+            errorMessage = errorData.detail || errorMessage
+          } catch {
+            errorMessage = errorText || errorMessage
+          }
+          
+          throw new Error(errorMessage)
         }
 
         const result = await response.json()
+        console.log('Analysis result:', result)
         
         // Format the result for display
         const mockResult = {
@@ -153,9 +173,11 @@ function App() {
       }
       formData.append('user_id', user.id)
 
-      // Use production backend URL or fallback to local
+      // Get backend URL from environment or use default
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
       const apiUrl = `${backendUrl}/analyze-video`
+
+      console.log('Calling API:', apiUrl)
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -163,8 +185,18 @@ function App() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Analysis failed')
+        const errorText = await response.text()
+        console.error('API Error Response:', errorText)
+        
+        let errorMessage = 'Analysis failed'
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.detail || errorMessage
+        } catch {
+          errorMessage = errorText || errorMessage
+        }
+        
+        throw new Error(errorMessage)
       }
 
       const result = await response.json()
@@ -393,7 +425,7 @@ function App() {
                   <VideoUpload 
                     onVideoSelect={handleVideoAnalysis} 
                     loading={analyzing}
-                    progress={analysisProgress}
+                    progress={analysisProgress || undefined}
                   />
                   {currentAnalysis && <AnalysisResult result={currentAnalysis} />}
                 </>
