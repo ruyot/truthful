@@ -83,7 +83,7 @@ def main():
     ai_dir.mkdir(parents=True, exist_ok=True)
 
     print("[*] Loading metadata from Hugging Face...")
-    dataset = load_dataset("WenhaoWang/VidProM", split="VidProM_unique")
+    dataset = load_dataset("WenhaoWang/VidProM", split="train")
     subset = dataset.select(range(min(args.max_videos, len(dataset))))
     subset.to_csv(os.path.join(args.output_dir, "VidProM_subset.csv"))
     print(f"[✓] Saved metadata CSV with {len(subset)} entries")
