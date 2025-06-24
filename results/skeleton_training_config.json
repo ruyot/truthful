@@ -1,0 +1,26 @@
+{
+  "model": {
+    "backbone": "efficientnet_b3",
+    "num_frames": 5,
+    "freeze_backbone": false,
+    "enable_multitask": false
+  },
+  "data": {
+    "dfd_dir": "data",
+    "vidprom_dir": "data",
+    "val_split": 0.2,
+    "num_workers": 4,
+    "max_videos_per_source": null
+  },
+  "training": {
+    "epochs": 10,
+    "batch_size": 16,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "loss": {
+      "classification_weight": 1.0,
+      "prompt_weight": 0.0,
+      "skeleton_weight": 0.1
+    }
+  }
+}

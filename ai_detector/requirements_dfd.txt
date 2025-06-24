@@ -1,0 +1,19 @@
+# Requirements for DFD Dataset Processing
+
+# Core dependencies
+opencv-python>=4.8.0
+numpy>=1.21.0
+tqdm>=4.62.0
+Pillow>=8.3.0
+
+# Kaggle dataset download
+kagglehub>=0.2.0
+
+# Utilities
+pathlib2>=2.3.7
+
+# Optional: For advanced video processing
+# ffmpeg-python>=0.2.0
+
+# Development
+pytest>=7.0.0

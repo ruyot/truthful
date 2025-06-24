@@ -1,0 +1,31 @@
+# AI Video Preprocessing Pipeline Requirements
+
+# Core dependencies
+opencv-python>=4.8.0
+numpy>=1.21.0
+Pillow>=8.3.0
+scikit-image>=0.19.0
+
+# OCR libraries
+easyocr>=1.7.0
+pytesseract>=0.3.10
+
+# Image hashing and comparison
+imagehash>=4.3.0
+
+# Metadata extraction
+ExifRead>=3.0.0
+
+# Video processing (ffmpeg should be installed separately)
+# ffmpeg-python>=0.2.0  # Optional Python wrapper
+
+# Utilities
+pathlib2>=2.3.7  # For older Python versions
+dataclasses>=0.8  # For Python < 3.7
+
+# Optional: C2PA integration (when available)
+# c2pa-python  # Not yet available, placeholder
+
+# Development and testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
