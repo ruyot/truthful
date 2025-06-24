@@ -2,6 +2,8 @@
 
 A production-ready AI video detection tool with skeleton-based structural matching, VidProM dataset integration, comprehensive preprocessing pipeline, and state-of-the-art deep learning models, featuring a React web app, Chrome extension, and cutting-edge AI detection capabilities.
 
+Note - Previous commited versions were overwritten (cross branches forced + across different divices)
+
 ## New in v4.0
 
 ### Skeleton-Based AI Detection
