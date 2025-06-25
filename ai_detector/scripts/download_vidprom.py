@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Comprehensive VidProM Dataset Download & Frame Extraction Script
 
