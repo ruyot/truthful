@@ -49,7 +49,7 @@ def main():
     real_dir.mkdir(parents=True, exist_ok=True)
 
     print("[*] Loading UCF101 dataset...")
-    dataset = load_dataset("datalab/ucf101", split="train[:{}]".format(args.max_videos))
+    dataset = load_dataset("ucf101", split="train[:{}]".format(args.max_videos))
 
     print(f"[✓] Loaded {len(dataset)} videos")
 
