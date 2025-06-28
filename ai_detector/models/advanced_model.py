@@ -94,3 +94,34 @@ class AdvancedAIDetector(nn.Module):
 
     def extract_frame_features(self, x: torch.Tensor) -> torch.Tensor:
         return self._extract_features(x)
+
+
+def get_advanced_transforms(mode: str = 'train', image_size: int = 224) -> transforms.Compose:
+    """
+    Get advanced image transforms for training or validation.
+    
+    Args:
+        mode: 'train' or 'val'
+        image_size: Target image size (default: 224)
+        
+    Returns:
+        Composed transforms
+    """
+    if mode == 'train':
+        return transforms.Compose([
+            transforms.Resize((image_size + 32, image_size + 32)),  # Slightly larger for cropping
+            transforms.RandomCrop(image_size),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomRotation(degrees=15),
+            transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+            transforms.RandomGrayscale(p=0.1),
+            transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.9, 1.1)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    else:  # val/test mode
+        return transforms.Compose([
+            transforms.Resize((image_size, image_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
