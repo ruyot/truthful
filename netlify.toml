@@ -17,4 +17,4 @@
   VITE_BACKEND_URL = "https://your-render-app.onrender.com"
 
 [build.environment]
-PYTHON_VERSION = "3.10"
+  PYTHON_VERSION = "3.10"
