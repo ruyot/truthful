@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Eye, LogOut, User, Menu, X } from 'lucide-react'
 import { supabase, type Database, type User as SupabaseUser } from './lib/supabase'
 import { AuthModal } from './components/AuthModal'
-import { EnhancedVideoUpload } from './components/enhanced/EnhancedVideoUpload'
-import { EnhancedAnalysisResult } from './components/enhanced/EnhancedAnalysisResult'
+import { EnhancedVideoUpload } from './enhanced/EnhancedVideoUpload'
+import { EnhancedAnalysisResult } from './enhanced/EnhancedAnalysisResult'
 import { AnalysisHistory, type HistoryItem } from './components/AnalysisHistory'
 import Particles from './components/backgrounds/Particles'
 import AnimatedEye from './components/animations/AnimatedEye'
 import MultiColorText from './components/animations/MultiColorText'
-import AnimatedGradientText from './components/animations/AnimatedGradientText'
-import AboutPage from './components/pages/AboutPage'
+import AnimatedGradientText from './components/animations/AnimatedGradient'
+import AboutPage from './pages/AboutPage'
 
 type VideoAnalysis = Database['public']['Tables']['video_analyses']['Row']
 
