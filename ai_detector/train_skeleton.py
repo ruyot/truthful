@@ -45,7 +45,7 @@ from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 from ai_detector.models.skeleton_model import create_skeleton_model, SkeletonLoss
-from ai_detector.models.advanced_model import get_advanced_transforms, AttentionAggregator
+from ai_detector.models.advanced_model import get_advanced_transforms, AttentionAggregator, TemporalCNNAggregator
 from ai_detector.datasets.frame_dataset import build_dataloaders
 
 def validate(
