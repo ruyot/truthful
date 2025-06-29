@@ -76,6 +76,7 @@ def validate(
     all_preds = []
     all_probs = []
     all_embeddings = []
+    all_frames = []
     
     with torch.no_grad():
         for frames, labels in tqdm(val_loader, desc="Validating"):
@@ -96,6 +97,7 @@ def validate(
             all_preds.extend(preds.cpu().numpy())
             all_probs.extend(probs.cpu().numpy())
             all_embeddings.append(outputs['embeddings'].cpu().numpy())
+            all_frames.append(frames.cpu())
     
     # Calculate metrics
     all_labels = np.array(all_labels)
@@ -125,12 +127,14 @@ def validate(
         # Calculate skeleton AUC
         skeleton_auc = roc_auc_score(all_labels, skeleton_probs)
         
-        # Get fused predictions
-        fused_results = model.fused_predict(frames, fusion_weight=0.5)
+        # Get fused predictions using a sample of frames
+        sample_frames = torch.cat(all_frames[:min(10, len(all_frames))], dim=0).to(device)
+        fused_results = model.fused_predict(sample_frames, fusion_weight=0.5)
         fused_probs = fused_results['fused_probs'].cpu().numpy()
         
-        # Calculate fused AUC
-        fused_auc = roc_auc_score(all_labels, fused_probs)
+        # Calculate fused AUC (use the same number of samples as fused predictions)
+        sample_labels = all_labels[:len(fused_probs)]
+        fused_auc = roc_auc_score(sample_labels, fused_probs)
     else:
         skeleton_auc = 0.0
         fused_auc = 0.0

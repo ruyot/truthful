@@ -81,7 +81,7 @@ class SkeletonBasedDetector(nn.Module):
         if not self.skeleton_initialized:
             raise ValueError("Skeletons must be computed before skeleton prediction")
         
-        embeddings_np = embeddings.cpu().numpy()
+        embeddings_np = embeddings.detach().cpu().numpy()
         
         # Calculate distances to AI and real skeletons
         ai_distances = self._calculate_skeleton_distance(embeddings_np, self.ai_skeleton)
