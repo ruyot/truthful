@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Shield, LogOut, User, Menu, X } from 'lucide-react'
+import { Eye, LogOut, User, Menu, X } from 'lucide-react'
 import { supabase, type Database, type User as SupabaseUser } from './lib/supabase'
 import { AuthModal } from './components/AuthModal'
-import { VideoUpload } from './components/VideoUpload'
-import { AnalysisResult } from './components/AnalysisResult'
+import { EnhancedVideoUpload } from './components/enhanced/EnhancedVideoUpload'
+import { EnhancedAnalysisResult } from './components/enhanced/EnhancedAnalysisResult'
 import { AnalysisHistory, type HistoryItem } from './components/AnalysisHistory'
+import Particles from './components/backgrounds/Particles'
+import AnimatedEye from './components/animations/AnimatedEye'
+import MultiColorText from './components/animations/MultiColorText'
+import AnimatedGradientText from './components/animations/AnimatedGradientText'
+import AboutPage from './components/pages/AboutPage'
 
 type VideoAnalysis = Database['public']['Tables']['video_analyses']['Row']
 
@@ -21,7 +26,7 @@ function App() {
   const [analyzing, setAnalyzing] = useState(false)
   const [analysisProgress, setAnalysisProgress] = useState<AnalysisProgress | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [currentView, setCurrentView] = useState<'upload' | 'history'>('upload')
+  const [currentView, setCurrentView] = useState<'upload' | 'history' | 'about'>('upload')
   const [supabaseConfigured, setSupabaseConfigured] = useState(false)
 
   useEffect(() => {
@@ -29,7 +34,7 @@ function App() {
     const hasSupabase = supabase !== null
     setSupabaseConfigured(hasSupabase)
 
-    if (hasSupabase && supabase) {
+    if (hasSupabase) {
       // Check initial auth state
       supabase.auth.getUser().then(({ data: { user } }) => {
         setUser(user)
@@ -57,8 +62,8 @@ function App() {
     const steps = [
       { status: 'downloading', message: 'Downloading video...', progress: 0 },
       { status: 'extracting', message: 'Extracting frames...', progress: 25 },
-      { status: 'analyzing', message: 'Analyzing with AI model...', progress: 50 },
-      { status: 'analyzing', message: 'Processing face regions...', progress: 75 },
+      { status: 'analyzing', message: 'Analyzing with neural network...', progress: 50 },
+      { status: 'analyzing', message: 'Processing structural patterns...', progress: 75 },
       { status: 'completing', message: 'Generating results...', progress: 90 },
     ]
 
@@ -237,78 +242,58 @@ function App() {
   }
 
   const handleSelectAnalysis = (analysis: HistoryItem) => {
-    // Convert HistoryItem to VideoAnalysis format
     const videoAnalysis: VideoAnalysis = {
       id: analysis.id,
-      user_id: user?.id || 'unknown',
+      user_id: 'unknown',
       video_url: analysis.video_url,
       video_filename: analysis.video_filename,
       overall_likelihood: analysis.overall_likelihood,
       analysis_results: analysis.analysis_results,
       created_at: analysis.created_at,
-      updated_at: analysis.created_at // Use created_at as fallback
+      updated_at: analysis.created_at
     }
     setCurrentAnalysis(videoAnalysis)
     setCurrentView('upload')
   }
 
-  // Helper function to convert VideoAnalysis to AnalysisResult format
-  const convertToAnalysisResult = (videoAnalysis: VideoAnalysis) => {
-    const results = videoAnalysis.analysis_results as Record<string, unknown>
-    
-    // Type definitions for nested objects
-    type PreprocessingDetails = {
-      metadata_flag: boolean
-      ocr_flag: boolean
-      logo_flag: boolean
-      final_decision: string
-      confidence_score: number
-      processing_time: number
-      frames_analyzed: number
-    } | undefined
-    
-    type MLAnalysis = {
-      timestamps: Array<{
-        time: number
-        likelihood: number
-        confidence: number
-        details?: {
-          structural_similarity_to_ai?: number
-          structural_match_score?: number
-          distance_method?: string
-        }
-      }>
-      total_frames: number
-      overall_likelihood: number
-      video_duration: number
-      analysis_fps: number
-    } | undefined
-    
-    return {
-      overall_likelihood: videoAnalysis.overall_likelihood,
-      analysis_results: {
-        method: (results.method as string) || 'combined_analysis',
-        preprocessing_details: results.preprocessing_details as PreprocessingDetails,
-        ml_analysis: results.ml_analysis as MLAnalysis,
-        early_detection: (results.early_detection as boolean) || false,
-        total_frames: (results.total_frames as number) || 0,
-        processing_time: (results.processing_time as number) || 0,
-        video_duration: results.video_duration as number | undefined,
-        detection_source: results.detection_source as string | undefined,
-        skeleton_available: results.skeleton_available as boolean | undefined,
-        skeleton_enabled: results.skeleton_enabled as boolean | undefined
-      },
-      video_url: videoAnalysis.video_url,
-      video_filename: videoAnalysis.video_filename,
-      created_at: videoAnalysis.created_at
-    }
+  // Show About page
+  if (currentView === 'about') {
+    return (
+      <>
+        <div className="fixed inset-0 -z-10 bg-white">
+          <Particles
+            particleColors={['#8B5CF6', '#A78BFA', '#C4B5FD', '#EC4899', '#3B82F6', '#10B981']}
+            particleCount={100}
+            particleSpread={10}
+            speed={0.1}
+            particleBaseSize={80}
+            moveParticlesOnHover={true}
+            alphaParticles={true}
+          />
+        </div>
+        <AboutPage onBack={() => setCurrentView('upload')} />
+      </>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Particles Background */}
+      <div className="fixed inset-0 -z-10 bg-white">
+        <Particles
+          particleColors={['#8B5CF6', '#A78BFA', '#C4B5FD', '#EC4899', '#3B82F6', '#10B981']}
+          particleCount={100}
+          particleSpread={10}
+          speed={0.1}
+          particleBaseSize={80}
+          moveParticlesOnHover={true}
+          alphaParticles={true}
+        />
+      </div>
+
       {/* Supabase Configuration Notice */}
       {!supabaseConfigured && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-3">
+        <div className="relative z-10 bg-yellow-50/90 backdrop-blur-sm border-b border-yellow-200 px-4 py-3">
           <div className="max-w-7xl mx-auto">
             <p className="text-yellow-800 text-sm">
               <strong>Demo Mode:</strong> Supabase not configured. Authentication and data persistence are disabled. 
@@ -319,184 +304,166 @@ function App() {
       )}
 
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Shield className="text-purple-600 mr-3" size={32} />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Truthful
-              </h1>
-            </div>
+      <header className="relative z-20 sticky top-0">
+        <div className="bg-white/80 backdrop-blur-md border-b border-purple-100 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setCurrentView('about')}
+                  className="flex items-center group"
+                >
+                  <div className="mr-3">
+                    <AnimatedEye size={32} color="#8B5CF6" />
+                  </div>
+                  <h1 className="text-2xl font-bold">
+                    <AnimatedGradientText gradient="from-purple-600 via-pink-600 to-blue-600">
+                      Truthful
+                    </AnimatedGradientText>
+                  </h1>
+                </button>
+              </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-6">
-              {(user || !supabaseConfigured) && (
-                <>
-                  <button
-                    onClick={() => setCurrentView('upload')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      currentView === 'upload' 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'text-gray-600 hover:text-purple-600'
-                    }`}
-                  >
-                    Analyze
-                  </button>
-                  {supabaseConfigured && (
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center space-x-6">
+                {(user || !supabaseConfigured) && (
+                  <div className="flex items-center space-x-4">
                     <button
-                      onClick={() => setCurrentView('history')}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        currentView === 'history' 
+                      onClick={() => setCurrentView('upload')}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        currentView === 'upload' 
                           ? 'bg-purple-100 text-purple-700' 
-                          : 'text-gray-600 hover:text-purple-600'
+                          : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
                       }`}
                     >
-                      History
+                      Analyze
                     </button>
-                  )}
-                </>
-              )}
-              
-              {supabaseConfigured && (
-                user ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-2">
-                      <User size={16} className="text-gray-600" />
-                      <span className="text-gray-700 text-sm">{user.email}</span>
-                    </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition-colors"
-                    >
-                      <LogOut size={16} />
-                      <span className="text-sm">Sign Out</span>
-                    </button>
+                    {supabaseConfigured && (
+                      <button
+                        onClick={() => setCurrentView('history')}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                          currentView === 'history' 
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
+                        }`}
+                      >
+                        History
+                      </button>
+                    )}
                   </div>
-                ) : (
-                  <div className="space-x-3">
-                    <button
-                      onClick={() => setAuthModal({ isOpen: true, mode: 'signin' })}
-                      className="text-gray-600 hover:text-purple-600 font-medium"
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      onClick={() => setAuthModal({ isOpen: true, mode: 'signup' })}
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
-                    >
-                      Get Started
-                    </button>
-                  </div>
-                )
-              )}
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200">
-            <div className="px-4 py-3 space-y-3">
-              {(user || !supabaseConfigured) && (
-                <>
-                  <button
-                    onClick={() => {
-                      setCurrentView('upload')
-                      setMobileMenuOpen(false)
-                    }}
-                    className={`block w-full text-left px-3 py-2 rounded-lg font-medium ${
-                      currentView === 'upload' 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'text-gray-600'
-                    }`}
-                  >
-                    Analyze
-                  </button>
-                  {supabaseConfigured && (
-                    <button
-                      onClick={() => {
-                        setCurrentView('history')
-                        setMobileMenuOpen(false)
-                      }}
-                      className={`block w-full text-left px-3 py-2 rounded-lg font-medium ${
-                        currentView === 'history' 
-                          ? 'bg-purple-100 text-purple-700' 
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      History
-                    </button>
-                  )}
-                  {supabaseConfigured && user && (
-                    <div className="border-t pt-3">
-                      <div className="flex items-center space-x-2 px-3 py-2">
-                        <User size={16} className="text-gray-600" />
-                        <span className="text-gray-700 text-sm">{user.email}</span>
+                )}
+                
+                {supabaseConfigured && (
+                  user ? (
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-purple-50 px-3 py-1 rounded-lg border border-purple-100">
+                        <div className="flex items-center space-x-2">
+                          <User size={16} className="text-purple-600" />
+                          <span className="text-gray-700 text-sm">{user.email}</span>
+                        </div>
                       </div>
                       <button
                         onClick={handleSignOut}
-                        className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg w-full"
+                        className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition-colors"
                       >
                         <LogOut size={16} />
                         <span className="text-sm">Sign Out</span>
                       </button>
                     </div>
-                  )}
-                </>
-              )}
-              
-              {supabaseConfigured && !user && (
-                <div className="space-y-2">
-                  <button
-                    onClick={() => {
-                      setAuthModal({ isOpen: true, mode: 'signin' })
-                      setMobileMenuOpen(false)
-                    }}
-                    className="block w-full text-left px-3 py-2 text-gray-600 hover:text-purple-600 font-medium"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAuthModal({ isOpen: true, mode: 'signup' })
-                      setMobileMenuOpen(false)
-                    }}
-                    className="block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200"
-                  >
-                    Get Started
-                  </button>
-                </div>
-              )}
+                  ) : (
+                    <button
+                      onClick={() => setAuthModal({ isOpen: true, mode: 'signin' })}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      Sign In
+                    </button>
+                  )
+                )}
+              </div>
+
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+              </div>
             </div>
           </div>
-        )}
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden">
+              <div className="bg-white/90 backdrop-blur-sm border-t border-purple-100 m-4 p-4 rounded-lg shadow-lg">
+                <div className="space-y-3">
+                  {(user || !supabaseConfigured) && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setCurrentView('upload')
+                          setMobileMenuOpen(false)
+                        }}
+                        className={`block w-full text-left px-3 py-2 rounded-lg font-medium ${
+                          currentView === 'upload' 
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        Analyze
+                      </button>
+                      {supabaseConfigured && (
+                        <button
+                          onClick={() => {
+                            setCurrentView('history')
+                            setMobileMenuOpen(false)
+                          }}
+                          className={`block w-full text-left px-3 py-2 rounded-lg font-medium ${
+                            currentView === 'history' 
+                              ? 'bg-purple-100 text-purple-700' 
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          History
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setCurrentView('about')
+                          setMobileMenuOpen(false)
+                        }}
+                        className={`block w-full text-left px-3 py-2 rounded-lg font-medium ${
+                          currentView === 'about' as any
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        About
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!supabaseConfigured || user ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {currentView === 'upload' ? (
                 <>
-                  <VideoUpload 
+                  <EnhancedVideoUpload 
                     onVideoSelect={handleVideoAnalysis} 
                     loading={analyzing}
                     progress={analysisProgress}
                   />
-                  {currentAnalysis && <AnalysisResult result={convertToAnalysisResult(currentAnalysis)} />}
+                  {currentAnalysis && <EnhancedAnalysisResult result={currentAnalysis} />}
                 </>
               ) : (
                 supabaseConfigured && <AnalysisHistory userId={user?.id || ''} onSelectAnalysis={handleSelectAnalysis} />
@@ -509,9 +476,14 @@ function App() {
                 <AnalysisHistory userId={user.id} onSelectAnalysis={handleSelectAnalysis} />
               )}
               
-              {/* Info Panel */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="font-semibold text-gray-900 mb-4">Enhanced Detection v2.0</h3>
+              {/* Enhanced Info Panel */}
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-purple-100 shadow-md transform hover:scale-105 transition-transform duration-300">
+                <h3 className="font-semibold text-gray-900 mb-4 text-center">
+                  <MultiColorText
+                    text="Enhanced Detection v4.0"
+                    colors={['#8B5CF6', '#EC4899', '#3B82F6']}
+                  />
+                </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
@@ -519,56 +491,76 @@ function App() {
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
-                    <p>Enhanced AI analysis with face detection at 3 FPS</p>
+                    <p>Skeleton-based structural analysis with VidProM integration</p>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
-                    <p>Get detailed results with improved accuracy</p>
+                    <p>Get detailed results with distance-based matching</p>
                   </div>
                 </div>
               </div>
 
-              {/* Enhanced Analysis Methods */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="font-semibold text-gray-900 mb-4">Enhanced Detection Methods</h3>
+              {/* Enhanced Detection Methods */}
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-purple-100 shadow-md transform hover:scale-105 transition-transform duration-300">
+                <h3 className="font-semibold text-gray-900 mb-4 text-center">
+                  <MultiColorText
+                    text="Advanced Detection Methods"
+                    colors={['#3B82F6', '#8B5CF6', '#EC4899']}
+                  />
+                </h3>
                 <div className="space-y-2 text-sm text-gray-600">
-                  <div>• <strong>MediaPipe Face Analysis:</strong> Advanced face region detection</div>
-                  <div>• <strong>Enhanced Texture Analysis:</strong> Multi-layer pattern detection</div>
-                  <div>• <strong>Improved Edge Detection:</strong> Sophisticated boundary analysis</div>
-                  <div>• <strong>Color Distribution:</strong> Advanced histogram analysis</div>
-                  <div>• <strong>Frequency Analysis:</strong> Spectral signature detection</div>
-                  <div>• <strong>Temporal Consistency:</strong> Frame-to-frame analysis</div>
+                  <div>• <strong>Skeleton-Based Matching:</strong> Structural pattern analysis</div>
+                  <div>• <strong>VidProM Integration:</strong> Novel AI content detection</div>
+                  <div>• <strong>Distance Metrics:</strong> Mahalanobis, Euclidean, Cosine</div>
+                  <div>• <strong>Multi-Frame Fusion:</strong> Temporal consistency analysis</div>
+                  <div>• <strong>Neural Networks:</strong> Deep CNN with attention</div>
+                  <div>• <strong>Fast Preprocessing:</strong> Metadata and watermark detection</div>
                 </div>
               </div>
 
               {/* Production Features */}
-              <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100">
-                <h3 className="font-semibold text-gray-900 mb-4">🚀 Production Ready</h3>
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-purple-100 shadow-md transform hover:scale-105 transition-transform duration-300">
+                <h3 className="font-semibold text-gray-900 mb-4 text-center">
+                  <MultiColorText
+                    text="🚀 Production Ready"
+                    colors={['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6']}
+                  />
+                </h3>
                 <div className="space-y-2 text-sm text-gray-600">
-                  <div>✅ Cloud deployment on Render & Netlify</div>
-                  <div>✅ Enhanced AI detection algorithms</div>
-                  <div>✅ Real-time progress tracking</div>
-                  <div>✅ Face-focused analysis</div>
-                  <div>✅ Increased sampling rate (3 FPS)</div>
-                  <div>✅ Production monitoring</div>
+                  <div>✅ Skeleton-based structural matching</div>
+                  <div>✅ VidProM dataset integration</div>
+                  <div>✅ Enhanced generalization capability</div>
+                  <div>✅ Real-time neural network visualization</div>
+                  <div>✅ Interactive UI with fluid animations</div>
+                  <div>✅ Production monitoring & deployment</div>
                 </div>
               </div>
             </div>
           </div>
         ) : (
           <div className="text-center py-16">
-            <Shield className="mx-auto mb-8 text-purple-600" size={64} />
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Detect AI-Generated Videos</h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Upload videos or paste URLs to analyze with our enhanced AI detection technology. 
-              Get detailed insights and confidence scores with improved accuracy.
-            </p>
-            <button
-              onClick={() => setAuthModal({ isOpen: true, mode: 'signup' })}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              Start Detecting Now
-            </button>
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-12 max-w-4xl mx-auto border border-purple-100 shadow-lg">
+              <div className="mb-8">
+                <AnimatedEye size={80} color="#8B5CF6" />
+              </div>
+              
+              <MultiColorText
+                text="Detect AI-Generated Videos"
+                className="text-5xl font-bold mb-6"
+                colors={['#8B5CF6', '#EC4899', '#3B82F6', '#EF4444', '#10B981']}
+              />
+              
+              <p className="text-xl text-gray-600 mb-12">
+                Your extra eyes in an ever-growing digital world
+              </p>
+              
+              <button
+                onClick={() => setAuthModal({ isOpen: true, mode: 'signup' })}
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white px-12 py-6 rounded-2xl font-semibold text-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105"
+              >
+                Start Detecting Now
+              </button>
+            </div>
           </div>
         )}
       </main>

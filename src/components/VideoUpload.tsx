@@ -9,7 +9,7 @@ interface VideoUploadProps {
     status: string
     progress: number
     message: string
-  } | null
+  }
 }
 
 export const VideoUpload: React.FC<VideoUploadProps> = ({ 

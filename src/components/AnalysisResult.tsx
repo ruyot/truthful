@@ -232,8 +232,8 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ result }) => {
           {structuralInfo.available && (
             <div className="flex justify-between items-center">
               <span className="text-gray-700">Structural Match Score:</span>
-              <span className={`font-medium ${getResultColor(structuralInfo.averageScore!)}`}>
-                {structuralInfo.averageScore!.toFixed(1)}% AI Profile
+              <span className={`font-medium ${getResultColor(structuralInfo.averageScore ?? 0)}`}>
+                {structuralInfo.averageScore?.toFixed(1) ?? '0.0'}% AI Profile
               </span>
             </div>
           )}
@@ -316,8 +316,8 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ result }) => {
             {structuralInfo.available && (
               <div className="mt-3 text-center">
                 <span className="text-xs text-blue-500">
-                  Avg structural similarity: {structuralInfo.averageScore!.toFixed(1)}% 
-                  (Range: {structuralInfo.minScore!.toFixed(1)}% - {structuralInfo.maxScore!.toFixed(1)}%)
+                  Avg structural similarity: {structuralInfo.averageScore?.toFixed(1) ?? '0.0'}% 
+                  (Range: {structuralInfo.minScore?.toFixed(1) ?? '0.0'}% - {structuralInfo.maxScore?.toFixed(1) ?? '0.0'}%)
                 </span>
               </div>
             )}

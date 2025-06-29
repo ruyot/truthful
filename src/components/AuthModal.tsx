@@ -19,14 +19,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) return
     setLoading(true)
     setError('')
-
-    if (!supabase) {
-      setError('Supabase not configured')
-      setLoading(false)
-      return
-    }
 
     try {
       if (mode === 'signup') {
@@ -44,23 +39,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
         if (error) throw error
       }
       onClose()
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      setError(errorMessage)
+    } catch (error: any) {
+      setError(error.message)
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleAuth = async () => {
+    if (!supabase) return
     setLoading(true)
-    
-    if (!supabase) {
-      setError('Supabase not configured')
-      setLoading(false)
-      return
-    }
-    
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -69,9 +57,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
         }
       })
       if (error) throw error
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      setError(errorMessage)
+    } catch (error: any) {
+      setError(error.message)
     } finally {
       setLoading(false)
     }
@@ -79,7 +66,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md relative">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-md relative shadow-xl">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -147,7 +134,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
         <button
           onClick={handleGoogleAuth}
           disabled={loading}
-          className="w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="w-full border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 text-gray-700"
         >
           <Chrome className="inline mr-2" size={18} />
           Continue with Google

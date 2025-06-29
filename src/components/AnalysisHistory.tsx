@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Clock, Video, ExternalLink, BarChart3, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import MultiColorText from './animations/MultiColorText'
 
 export interface HistoryItem {
   id: string
@@ -20,7 +21,15 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchHistory = useCallback(async () => {
+  useEffect(() => {
+    if (supabase && userId) {
+      fetchHistory()
+    } else {
+      setLoading(false)
+    }
+  }, [userId])
+
+  const fetchHistory = async () => {
     if (!supabase) return
 
     try {
@@ -38,15 +47,7 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
     } finally {
       setLoading(false)
     }
-  }, [userId])
-
-  useEffect(() => {
-    if (supabase && userId) {
-      fetchHistory()
-    } else {
-      setLoading(false)
-    }
-  }, [userId, fetchHistory])
+  }
 
   const deleteAnalysis = async (id: string) => {
     if (!supabase) return
@@ -58,7 +59,7 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
         .eq('id', id)
 
       if (error) throw error
-      setHistory(history.filter((item: HistoryItem) => item.id !== id))
+      setHistory(history.filter(item => item.id !== id))
     } catch (error) {
       console.error('Error deleting analysis:', error)
     }
@@ -72,7 +73,7 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
 
   if (!supabase) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+      <div className="bg-white rounded-2xl p-8 shadow-md border border-purple-100 text-center">
         <Video className="mx-auto mb-4 text-gray-400" size={48} />
         <h2 className="text-xl font-bold text-gray-900 mb-2">History Unavailable</h2>
         <p className="text-gray-600">Configure Supabase to enable analysis history</p>
@@ -82,14 +83,19 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Analysis History</h2>
+      <div className="bg-white rounded-2xl p-8 shadow-md border border-purple-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
+          <MultiColorText
+            text="Analysis History"
+            colors={['#8B5CF6', '#EC4899', '#3B82F6']}
+          />
+        </h2>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="bg-gray-200 rounded-lg p-4">
-                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+              <div className="bg-gray-100 rounded-lg p-4">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
               </div>
             </div>
           ))}
@@ -100,7 +106,7 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
 
   if (history.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+      <div className="bg-white rounded-2xl p-8 shadow-md border border-purple-100 text-center">
         <Video className="mx-auto mb-4 text-gray-400" size={48} />
         <h2 className="text-xl font-bold text-gray-900 mb-2">No Analysis History</h2>
         <p className="text-gray-600">Your analyzed videos will appear here</p>
@@ -109,11 +115,16 @@ export const AnalysisHistory: React.FC<AnalysisHistoryProps> = ({ userId, onSele
   }
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-lg">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Analysis History</h2>
+    <div className="bg-white rounded-2xl p-8 shadow-md border border-purple-100">
+      <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
+        <MultiColorText
+          text="Analysis History"
+          colors={['#8B5CF6', '#EC4899', '#3B82F6']}
+        />
+      </h2>
       <div className="space-y-4">
-        {history.map((item: HistoryItem) => (
-          <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+        {history.map((item) => (
+          <div key={item.id} className="border border-gray-200 bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors transform hover:scale-105 transition-transform duration-300">
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
