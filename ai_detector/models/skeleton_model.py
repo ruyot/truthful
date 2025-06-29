@@ -16,7 +16,17 @@ class SkeletonEmbedding:
         self.feature_dim = embeddings.shape[1]
         self.mean = np.mean(embeddings, axis=0)
         self.std = np.std(embeddings, axis=0)
-        self.cov = np.cov(embeddings.T)
+        
+        # Handle covariance calculation with proper degrees of freedom
+        if self.n_samples > 1:
+            # Use ddof=1 for sample covariance (unbiased estimator)
+            self.cov = np.cov(embeddings.T, ddof=1)
+            # Add small regularization to ensure positive definiteness
+            self.cov += np.eye(self.cov.shape[0]) * 1e-6
+        else:
+            # If only one sample, use identity matrix
+            self.cov = np.eye(self.feature_dim)
+        
         self.median = np.median(embeddings, axis=0)
         self.mad = np.median(np.abs(embeddings - self.median), axis=0)
         self.embeddings = embeddings.copy()
@@ -118,17 +128,30 @@ class SkeletonBasedDetector(nn.Module):
         }
 
     def _calculate_skeleton_distance(self, embeddings: np.ndarray, skeleton: SkeletonEmbedding) -> np.ndarray:
-        """Calculate Mahalanobis distance to skeleton."""
+        """Calculate Mahalanobis distance to skeleton with robust error handling."""
         diff = embeddings - skeleton.mean
-        try:
-            # Use pseudo-inverse for numerical stability
-            inv_cov = np.linalg.pinv(skeleton.cov)
-            mahal_dist = np.sqrt(np.sum(diff @ inv_cov * diff, axis=1))
-        except:
-            # Fallback to Euclidean distance if covariance is singular
-            mahal_dist = np.linalg.norm(diff, axis=1)
         
-        return mahal_dist
+        try:
+            # Check if covariance matrix is valid
+            if skeleton.n_samples <= 1:
+                # Use Euclidean distance for single samples
+                return np.linalg.norm(diff, axis=1)
+            
+            # Use pseudo-inverse for numerical stability
+            inv_cov = np.linalg.pinv(skeleton.cov, rcond=1e-10)
+            
+            # Calculate Mahalanobis distance
+            mahal_dist = np.sqrt(np.sum(diff @ inv_cov * diff, axis=1))
+            
+            # Handle any NaN or infinite values
+            mahal_dist = np.nan_to_num(mahal_dist, nan=1e6, posinf=1e6, neginf=1e6)
+            
+            return mahal_dist
+            
+        except (np.linalg.LinAlgError, ValueError) as e:
+            # Fallback to Euclidean distance if covariance calculation fails
+            logger.warning(f"Mahalanobis distance failed, using Euclidean: {e}")
+            return np.linalg.norm(diff, axis=1)
 
 
 class SkeletonLoss(nn.Module):

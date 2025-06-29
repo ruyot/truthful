@@ -116,26 +116,33 @@ def validate(
     real_embeddings = all_embeddings[real_mask]
     
     # Compute skeletons
-    if len(ai_embeddings) > 0 and len(real_embeddings) > 0:
-        model.compute_skeletons(ai_embeddings, real_embeddings)
-        
-        # Get skeleton predictions
-        embeddings_tensor = torch.tensor(all_embeddings, device=device)
-        skeleton_results = model.skeleton_predict(embeddings_tensor)
-        skeleton_probs = skeleton_results['skeleton_probs'].cpu().numpy()
-        
-        # Calculate skeleton AUC
-        skeleton_auc = roc_auc_score(all_labels, skeleton_probs)
-        
-        # Get fused predictions using a sample of frames
-        sample_frames = torch.cat(all_frames[:min(10, len(all_frames))], dim=0).to(device)
-        fused_results = model.fused_predict(sample_frames, fusion_weight=0.5)
-        fused_probs = fused_results['fused_probs'].cpu().numpy()
-        
-        # Calculate fused AUC (use the same number of samples as fused predictions)
-        sample_labels = all_labels[:len(fused_probs)]
-        fused_auc = roc_auc_score(sample_labels, fused_probs)
+    if len(ai_embeddings) > 1 and len(real_embeddings) > 1:  # Need at least 2 samples per class
+        try:
+            model.compute_skeletons(ai_embeddings, real_embeddings)
+            
+            # Get skeleton predictions
+            embeddings_tensor = torch.tensor(all_embeddings, device=device)
+            skeleton_results = model.skeleton_predict(embeddings_tensor)
+            skeleton_probs = skeleton_results['skeleton_probs'].cpu().numpy()
+            
+            # Calculate skeleton AUC
+            skeleton_auc = roc_auc_score(all_labels, skeleton_probs)
+            
+            # Get fused predictions using a sample of frames
+            sample_frames = torch.cat(all_frames[:min(10, len(all_frames))], dim=0).to(device)
+            fused_results = model.fused_predict(sample_frames, fusion_weight=0.5)
+            fused_probs = fused_results['fused_probs'].cpu().numpy()
+            
+            # Calculate fused AUC (use the same number of samples as fused predictions)
+            sample_labels = all_labels[:len(fused_probs)]
+            fused_auc = roc_auc_score(sample_labels, fused_probs)
+            
+        except Exception as e:
+            print(f"Warning: Skeleton computation failed: {e}")
+            skeleton_auc = 0.0
+            fused_auc = 0.0
     else:
+        print(f"Warning: Not enough samples for skeleton computation (AI: {len(ai_embeddings)}, Real: {len(real_embeddings)})")
         skeleton_auc = 0.0
         fused_auc = 0.0
     
