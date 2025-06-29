@@ -45,7 +45,7 @@ from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 from ai_detector.models.skeleton_model import create_skeleton_model, SkeletonLoss
-from ai_detector.models.advanced_model import get_advanced_transforms, AttentionAggregator, TemporalCNNAggregator
+from ai_detector.models.advanced_model import get_advanced_transforms
 from ai_detector.datasets.frame_dataset import build_dataloaders
 
 def validate(
@@ -76,7 +76,6 @@ def validate(
     all_preds = []
     all_probs = []
     all_embeddings = []
-    all_frames = []
     
     with torch.no_grad():
         for frames, labels in tqdm(val_loader, desc="Validating"):
@@ -96,8 +95,9 @@ def validate(
             all_labels.extend(labels.cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
             all_probs.extend(probs.cpu().numpy())
+            
+            # Store embeddings (on CPU to save GPU memory)
             all_embeddings.append(outputs['embeddings'].cpu().numpy())
-            all_frames.append(frames.cpu())
     
     # Calculate metrics
     all_labels = np.array(all_labels)
@@ -115,36 +115,59 @@ def validate(
     ai_embeddings = all_embeddings[ai_mask]
     real_embeddings = all_embeddings[real_mask]
     
-    # Compute skeletons
-    if len(ai_embeddings) > 1 and len(real_embeddings) > 1:  # Need at least 2 samples per class
-        try:
-            model.compute_skeletons(ai_embeddings, real_embeddings)
-            
-            # Get skeleton predictions
-            embeddings_tensor = torch.tensor(all_embeddings, device=device)
-            skeleton_results = model.skeleton_predict(embeddings_tensor)
-            skeleton_probs = skeleton_results['skeleton_probs'].cpu().numpy()
-            
-            # Calculate skeleton AUC
-            skeleton_auc = roc_auc_score(all_labels, skeleton_probs)
-            
-            # Get fused predictions using a sample of frames
-            sample_frames = torch.cat(all_frames[:min(10, len(all_frames))], dim=0).to(device)
-            fused_results = model.fused_predict(sample_frames, fusion_weight=0.5)
-            fused_probs = fused_results['fused_probs'].cpu().numpy()
-            
-            # Calculate fused AUC (use the same number of samples as fused predictions)
-            sample_labels = all_labels[:len(fused_probs)]
-            fused_auc = roc_auc_score(sample_labels, fused_probs)
-            
-        except Exception as e:
-            print(f"Warning: Skeleton computation failed: {e}")
-            skeleton_auc = 0.0
-            fused_auc = 0.0
+    # Memory-safe skeleton computation
+    skeleton_auc = 0.0
+    fused_auc = 0.0
+    
+    if len(ai_embeddings) > 0 and len(real_embeddings) > 0:
+        # Check if we need to sample embeddings for memory safety
+        MAX_EMBEDDINGS_PER_CLASS = 10000
+        ai_sampled = False
+        real_sampled = False
+        
+        if len(ai_embeddings) > MAX_EMBEDDINGS_PER_CLASS:
+            indices = np.random.choice(len(ai_embeddings), MAX_EMBEDDINGS_PER_CLASS, replace=False)
+            ai_embeddings = ai_embeddings[indices]
+            ai_sampled = True
+        
+        if len(real_embeddings) > MAX_EMBEDDINGS_PER_CLASS:
+            indices = np.random.choice(len(real_embeddings), MAX_EMBEDDINGS_PER_CLASS, replace=False)
+            real_embeddings = real_embeddings[indices]
+            real_sampled = True
+        
+        if ai_sampled or real_sampled:
+            print(f"[WARN] Sampled embeddings for memory safety: AI={len(ai_embeddings)}/{ai_mask.sum()}, Real={len(real_embeddings)}/{real_mask.sum()}")
+            if writer:
+                writer.add_text('Validation/EmbeddingSampling', 
+                               f"Epoch {epoch}: AI={len(ai_embeddings)}/{ai_mask.sum()}, Real={len(real_embeddings)}/{real_mask.sum()}", 
+                               epoch)
+        
+        # Compute skeletons with the sampled embeddings
+        model.compute_skeletons(ai_embeddings, real_embeddings)
+        
+        # Get skeleton predictions - process in half precision for memory efficiency
+        embeddings_tensor = torch.tensor(all_embeddings, device=device, dtype=torch.float16)
+        skeleton_results = model.skeleton_predict(embeddings_tensor)
+        skeleton_probs = skeleton_results['skeleton_probs'].cpu().numpy()
+        
+        # Calculate skeleton AUC
+        skeleton_auc = roc_auc_score(all_labels, skeleton_probs)
+        
+        # Get fused predictions
+        # We'll use a small batch of frames for the fusion prediction to avoid memory issues
+        sample_frames = next(iter(val_loader))[0][:min(8, len(next(iter(val_loader))[0]))].to(device)
+        fused_results = model.fused_predict(sample_frames, fusion_weight=0.5)
+        
+        # For the actual AUC calculation, we'll combine base and skeleton probabilities
+        fused_probs = 0.5 * all_probs + 0.5 * skeleton_probs
+        
+        # Calculate fused AUC
+        fused_auc = roc_auc_score(all_labels, fused_probs)
+        
+        # Log the final sample sizes used
+        print(f"[INFO] Skeleton embeddings used: AI={len(ai_embeddings)}/{ai_mask.sum()}, Real={len(real_embeddings)}/{real_mask.sum()}")
     else:
-        print(f"Warning: Not enough samples for skeleton computation (AI: {len(ai_embeddings)}, Real: {len(real_embeddings)})")
-        skeleton_auc = 0.0
-        fused_auc = 0.0
+        print("[WARN] One of the classes has no samples in validation set")
     
     # Calculate AUC
     try:
@@ -325,8 +348,10 @@ def main():
     # Recreate aggregator with specified temporal head
     feature_dim = model.base_detector.feature_dim
     if args.temporal_head == 'temporal_cnn':
+        from ai_detector.models.advanced_model import TemporalCNNAggregator
         model.base_detector.aggregator = TemporalCNNAggregator(feature_dim, args.num_frames).to(device)
     else:
+        from ai_detector.models.advanced_model import AttentionAggregator
         model.base_detector.aggregator = AttentionAggregator(feature_dim, args.num_frames).to(device)
     
     # Create loss function and optimizer

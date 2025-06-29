@@ -1,6 +1,6 @@
 # Skeleton-Based AI Video Detection with VidProM Dataset
 
-A AI video detection system using skeleton-based structural matching with the VidProM dataset for improved generalization to novel AI content.
+AI video detection system using skeleton-based structural matching with the VidProM dataset for improved generalization to novel AI content.
 
 ## **Key Features**
 
@@ -140,7 +140,7 @@ sampling_strategies = [
 ]
 ```
 
-## 📈 **Expected Performance**
+## **Expected Performance**
 
 ### **Benchmark Results** (DFD + VidProM Dataset)
 
@@ -165,7 +165,7 @@ sampling_strategies = [
 | Uniform | 92.8% | 0.963 | Better |
 | Rand-Stride | 94.2% | 0.975 | Best |
 
-## 🔧 **Configuration Options**
+## **Configuration Options**
 
 ### **Fusion Weight Tuning**
 
@@ -242,16 +242,3 @@ tensorboard --logdir logs/
    # Enable FrameMix
    --framemix_prob 0.25
    ```
-
-## **Citation**
-
-```bibtex
-@software{skeleton_ai_video_detector,
-  title={Skeleton-Based AI Video Detection with Enhanced Temporal Sampling},
-  author={Truthful AI Detection Team},
-  year={2024},
-  url={https://github.com/your-repo/truthful-ai-detector}
-}
-```
-
-This skeleton-based approach provides significant improvements in detecting novel AI-generated content through learned structural representations, enhanced temporal sampling, and distance-based matching.
