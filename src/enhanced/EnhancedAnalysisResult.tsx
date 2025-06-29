@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { CheckCircle, AlertTriangle, XCircle, Clock, Eye, BarChart3, ExternalLink, Zap, Brain, Search, Shield, Target } from 'lucide-react'
-import MultiColorText from '../animations/MultiColorText'
+import MultiColorText from '../components/animations/MultiColorText'
 import { NeuralNetworkDiagram } from '../neural/NeuralNetworkDiagram'
-import AnimatedGradientText from '../animations/AnimatedGradient'
+import AnimatedGradientText from '../components/animations/AnimatedGradient'
 
 interface AnalysisResult {
   overall_likelihood: number

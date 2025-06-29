@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Upload, Link, Video, AlertCircle, Loader2, Zap, Brain, Search, Eye } from 'lucide-react'
-import MultiColorText from '../animations/MultiColorText'
-import AnimatedGradientText from '../animations/AnimatedGradient'
+import MultiColorText from '../components/animations/MultiColorText'
+import AnimatedGradientText from '../components/animations/AnimatedGradient'
 
 interface EnhancedVideoUploadProps {
   onVideoSelect: (file: File | null, url: string) => void

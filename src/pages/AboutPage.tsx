@@ -1,8 +1,8 @@
 import React from 'react';
 import { ArrowLeft, Github, Linkedin, Mail, Heart, Code, Zap } from 'lucide-react';
-import MultiColorText from '../animations/MultiColorText';
+import MultiColorText from '../components/animations/MultiColorText';
 import ProfileCard from '../ui/ProfileCard';
-import AnimatedEye from '../animations/AnimatedEye';
+import AnimatedEye from '../components/animations/AnimatedEye';
 
 interface AboutPageProps {
   onBack: () => void;

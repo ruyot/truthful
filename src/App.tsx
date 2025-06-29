@@ -461,9 +461,9 @@ function App() {
                   <EnhancedVideoUpload 
                     onVideoSelect={handleVideoAnalysis} 
                     loading={analyzing}
-                    progress={analysisProgress}
+                    progress={analysisProgress || undefined}
                   />
-                  {currentAnalysis && <EnhancedAnalysisResult result={currentAnalysis} />}
+                  {currentAnalysis && <EnhancedAnalysisResult result={currentAnalysis as any} />}
                 </>
               ) : (
                 supabaseConfigured && <AnalysisHistory userId={user?.id || ''} onSelectAnalysis={handleSelectAnalysis} />
