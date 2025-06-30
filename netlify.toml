@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "npm run build"
+  command = "pip install -r requirements-netlify.txt && npm run build"
 
 [[redirects]]
   from = "/*"
@@ -8,10 +8,10 @@
   status = 200
 
 [context.production.environment]
-  VITE_BACKEND_URL = "https://your-render-app.onrender.com"
+  VITE_BACKEND_URL = "https://truthful.onrender.com"
 
 [context.deploy-preview.environment]
-  VITE_BACKEND_URL = "https://your-render-app.onrender.com"
+  VITE_BACKEND_URL = "https://truthful.onrender.com"
 
 [build.environment]
   PYTHON_VERSION = "3.10"
