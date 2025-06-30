@@ -10,6 +10,7 @@ import AnimatedEye from './components/animations/AnimatedEye'
 import MultiColorText from './components/animations/MultiColorText'
 import AnimatedGradientText from './components/animations/AnimatedGradient'
 import AboutPage from './pages/AboutPage'
+import BoltBadge from './components/BoltBadge'
 
 type VideoAnalysis = Database['public']['Tables']['video_analyses']['Row']
 
@@ -34,7 +35,7 @@ function App() {
     const hasSupabase = supabase !== null
     setSupabaseConfigured(hasSupabase)
 
-    if (hasSupabase) {
+    if (hasSupabase && supabase) {
       // Check initial auth state
       supabase.auth.getUser().then(({ data: { user } }) => {
         setUser(user)
@@ -555,6 +556,7 @@ function App() {
           onToggleMode={() => setAuthModal({ ...authModal, mode: authModal.mode === 'signin' ? 'signup' : 'signin' })}
         />
       )}
+      <BoltBadge />
     </div>
   )
 }
