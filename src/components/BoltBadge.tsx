@@ -26,7 +26,7 @@ export default function BoltBadge() {
       style={badgeStyle}
     >
       <img
-        src={boltBadge}
+        src={"/bolt-badge-black.svg"}
         alt="Bolt.new badge"
         style={{ width: "100%", height: "100%" }}
       />
