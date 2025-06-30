@@ -9,10 +9,13 @@
 
 [context.production.environment]
   VITE_BACKEND_URL = "https://truthful.onrender.com"
+  PIP_NO_DEPS = "false"
 
 [context.deploy-preview.environment]
   VITE_BACKEND_URL = "https://truthful.onrender.com"
+  PIP_NO_DEPS = "false"
 
 [build.environment]
   PYTHON_VERSION = "3.10"
   NODE_VERSION = "18"
+  PIP_NO_DEPS = "false"
