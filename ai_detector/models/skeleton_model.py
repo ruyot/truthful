@@ -289,7 +289,7 @@ class SkeletonBasedDetector(nn.Module):
         if self.ai_skeleton is None or self.real_skeleton is None:
             raise ValueError("Skeletons not computed. Call compute_skeletons() first.")
         
-        embeddings_np = embeddings.cpu().numpy()
+        embeddings_np = embeddings.detach().cpu().numpy()
         batch_size = embeddings_np.shape[0]
         
         ai_distances = []
