@@ -12,7 +12,7 @@ services:
       - key: SKELETON_MODEL_PATH
         value: /var/models/skeleton_model_v4.pt
       - key: USE_SKELETON_MODEL
-        value: false # for now
+        value: True
       - key: SKELETON_FUSION_WEIGHT
         value: 0.6
       - key: SKELETON_DISTANCE_METHOD
