@@ -1,0 +1,6 @@
+python - <<'EOF'
+import torch, torch.nn as nn, pathlib
+path = pathlib.Path("results")
+path.mkdir(exist_ok=True)
+torch.save(nn.Linear(1, 1).state_dict(), path / "skeleton_model_v4.pt")
+EOF

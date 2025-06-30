@@ -10,9 +10,9 @@ services:
       - key: PORT
         value: 10000
       - key: SKELETON_MODEL_PATH
-        value: /var/models/skeleton_model_v3.pt
+        value: /var/models/skeleton_model_v4.pt
       - key: USE_SKELETON_MODEL
-        value: true
+        value: false # for now
       - key: SKELETON_FUSION_WEIGHT
         value: 0.6
       - key: SKELETON_DISTANCE_METHOD
