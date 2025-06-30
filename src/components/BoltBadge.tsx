@@ -1,5 +1,5 @@
 import React from "react";
-import boltBadge from "../assets/bolt-badge-black.svg";
+import boltBadgePng from "../assets/black_circle_360x360.png";
 
 const badgeStyle: React.CSSProperties = {
   position: "fixed",
@@ -26,7 +26,7 @@ export default function BoltBadge() {
       style={badgeStyle}
     >
       <img
-        src={"/bolt-badge-black.svg"}
+        src={boltBadgePng}
         alt="Bolt.new badge"
         style={{ width: "100%", height: "100%" }}
       />
