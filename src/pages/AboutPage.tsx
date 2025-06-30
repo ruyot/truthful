@@ -149,17 +149,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Background</h3>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  [Hi! My name is Tahmeed and I'm a Computer Science and Business Double Degree student at Laurier in Ontario Canada. 
+                  Hi! My name is Tahmeed and I'm a Computer Science and Business Double Degree student at Laurier in Ontario Canada. 
                   As a kid who grew up with videogames like cyberpunk, AI has been an interest of mine for a while, Truthful was designed with that same interest
-                  in mind while tailoring to the secuirty concerns of the everyday user highlighting how the development of AI also acccelerates the development of security.]
+                  in mind while tailoring to the secuirty concerns of the everyday user highlighting how the development of AI also acccelerates the development of security.
                 </p>
                 <p>
-                  [My machine learning experience extends from projects to classwork and coop experience (looking into breaking into the AI & ML industry in the future). 
+                  My machine learning experience extends from projects to classwork and coop experience (looking into breaking into the AI & ML industry in the future). 
                   Truthful came to me as an idea beyond just an everyday ai checker, but an all in one security platform/application for 
-                  the general user and businesses, which will be one of the most important aspects in a accelerating digital world.]
+                  the general user and businesses, which will be one of the most important aspects in a accelerating digital world.
                 </p>
                 <p>
-                  [In an age where the truth can be hard to find, we stand as a platform for authenticity.]
+                  In an age where the truth can be hard to find, we stand as a platform for authenticity.
                 </p>
               </div>
             </div>
