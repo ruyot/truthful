@@ -517,24 +517,6 @@ function App() {
                   <div>• <strong>Fast Preprocessing:</strong> Metadata and watermark detection</div>
                 </div>
               </div>
-
-              {/* Production Features */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-purple-100 shadow-md transform hover:scale-105 transition-transform duration-300">
-                <h3 className="font-semibold text-gray-900 mb-4 text-center">
-                  <MultiColorText
-                    text="🚀 Production Ready"
-                    colors={['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6']}
-                  />
-                </h3>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div>✅ Skeleton-based structural matching</div>
-                  <div>✅ VidProM dataset integration</div>
-                  <div>✅ Enhanced generalization capability</div>
-                  <div>✅ Real-time neural network visualization</div>
-                  <div>✅ Interactive UI with fluid animations</div>
-                  <div>✅ Production monitoring & deployment</div>
-                </div>
-              </div>
             </div>
           </div>
         ) : (
@@ -545,13 +527,13 @@ function App() {
               </div>
               
               <MultiColorText
-                text="Detect AI-Generated Videos"
+                text="Truthful"
                 className="text-5xl font-bold mb-6"
                 colors={['#8B5CF6', '#EC4899', '#3B82F6', '#EF4444', '#10B981']}
               />
               
               <p className="text-xl text-gray-600 mb-12">
-                Your extra eyes in an ever-growing digital world
+                Your eyes in an ever-growing digital world
               </p>
               
               <button

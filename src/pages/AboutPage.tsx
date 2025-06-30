@@ -3,6 +3,7 @@ import { ArrowLeft, Github, Linkedin, Mail, Heart, Code, Zap } from 'lucide-reac
 import MultiColorText from '../components/animations/MultiColorText';
 import ProfileCard from '../ui/ProfileCard';
 import AnimatedEye from '../components/animations/AnimatedEye';
+import mePng from '../assets/me.png';
 
 interface AboutPageProps {
   onBack: () => void;
@@ -50,18 +51,18 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  In an era where AI-generated content is becoming increasingly sophisticated, 
+                  In an era where AI-generated content & fraud is becoming increasingly sophisticated, 
                   Truthful serves as your digital guardian, helping you distinguish between 
-                  authentic and artificially created videos.
+                  authentic and artificial to see the truth.
                 </p>
                 <p>
                   Our advanced detection system combines cutting-edge machine learning with 
                   skeleton-based structural analysis to provide accurate, reliable results 
-                  across diverse video sources and generation methods.
+                  across diverse video sources and generation methods. 
                 </p>
                 <p>
-                  We believe in transparency, accuracy, and empowering users with the tools 
-                  they need to navigate today's digital landscape with confidence.
+                  Soon to be an all in one fraud detection and security platform, we believe in transparency, accuracy, 
+                  and empowering users with the tools they need to navigate today's digital landscape with confidence.  
                 </p>
               </div>
             </div>
@@ -95,9 +96,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 Open Source
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Truthful is built with transparency in mind. Our detection algorithms and 
+                Truthful is currently in open source beta and all detection algorithms and 
                 methodologies are open for review, ensuring trust and continuous improvement 
-                through community collaboration.
+                through community feedback.
               </p>
               <div className="flex gap-4">
                 <a
@@ -127,19 +128,19 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
                 <MultiColorText
-                  text="Meet the Creator"
+                  text="The Founder"
                   colors={['#8B5CF6', '#EC4899', '#3B82F6']}
                 />
               </h2>
               <div className="flex justify-center">
                 <ProfileCard
-                  name="Your Name Here"
-                  title="AI Research Engineer"
-                  handle="yourhandle"
+                  name="Tahmeed Tabeeb"
+                  title="Developer"
+                  handle="tahmeed_t"
                   status="Building the Future"
                   contactText="Get in Touch"
-                  avatarUrl="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400"
-                  onContactClick={() => window.open('mailto:your-email@example.com')}
+                  avatarUrl={mePng}
+                  onContactClick={() => window.open('mailto:tabeeb700@gmail.com')}
                 />
               </div>
             </div>
@@ -148,15 +149,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Background</h3>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  [Your background story here - replace this with your actual background, 
-                  experience, and motivation for creating this project]
+                  [Hi! My name is Tahmeed and I'm a Computer Science and Business Double Degree student at Laurier in Ontario Canada. 
+                  As a kid who grew up with videogames like cyberpunk, AI has been an interest of mine for a while, Truthful was designed with that same interest
+                  in mind while tailoring to the secuirty concerns of the everyday user highlighting how the development of AI also acccelerates the development of security.]
                 </p>
                 <p>
-                  [Add details about your expertise in AI, machine learning, computer vision, 
-                  or related fields that led to the development of Truthful]
+                  [My machine learning experience extends from projects to classwork and coop experience (looking into breaking into the AI & ML industry in the future). 
+                  Truthful came to me as an idea beyond just an everyday ai checker, but an all in one security platform/application for 
+                  the general user and businesses, which will be one of the most important aspects in a accelerating digital world.]
                 </p>
                 <p>
-                  [Include your vision for the future of AI detection and digital authenticity]
+                  [In an age where the truth can be hard to find, we stand as a platform for authenticity.]
                 </p>
               </div>
             </div>
@@ -169,10 +172,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                   className="flex items-center gap-3 text-gray-700 hover:text-purple-700 transition-colors"
                 >
                   <Mail size={20} />
-                  <span>your-email@example.com</span>
+                  <span>tabeeb700@gmail.com</span>
                 </a>
                 <a
-                  href="https://linkedin.com/in/yourprofile"
+                  href="https://linkedin.com/in/tahmeedt"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-700 hover:text-purple-700 transition-colors"
@@ -181,7 +184,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                   <span>LinkedIn Profile</span>
                 </a>
                 <a
-                  href="https://github.com/yourusername"
+                  href="https://github.com/ruyot"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-700 hover:text-purple-700 transition-colors"
